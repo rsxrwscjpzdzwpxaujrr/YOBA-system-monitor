@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>DialGauge.qml</file>
-        <file>CpuIndicator.qml</file>
-        <file>RamIndicator.qml</file>
+        <file>src/main.qml</file>
+        <file>src/DialGauge.qml</file>
+        <file>src/CpuIndicator.qml</file>
+        <file>src/RamIndicator.qml</file>
     </qresource>
 </RCC>
