@@ -1,0 +1,9 @@
+/*
+
+!.gitignore
+!/README.md
+!/COPYING
+!/screenshot.png
+!/qml.qrc
+!/*.pro
+!/src
