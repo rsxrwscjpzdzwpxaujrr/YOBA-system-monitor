@@ -26,26 +26,36 @@ Item {
     width: 400
     height: 400
 
-    Connections {
-        target: Backend
+    property real value: 0
 
-        function onCpuLoadChanged() { anim.start(); }
+    Timer {
+        id: timer
+
+        interval: 1000
+        repeat: true
+        running: true
+
+        onTriggered: {
+            value = Backend.getCpuLoad();
+        }
     }
 
-    Component.onCompleted: Backend.start();
+    Component.onCompleted: {
+        value = Backend.getCpuLoad();
+    }
 
     DialGauge {
         id: indicator
 
         anchors.horizontalCenter: parent.horizontalCenter
 
-        PropertyAnimation on value {
-            id: anim
+        value: root.value
 
-            easing.type: Easing.InOutQuad
-            duration: 950
-            to: Backend.cpuLoad
-            running: false
+        Behavior on value {
+            PropertyAnimation {
+                easing.type: Easing.InOutQuad
+                duration: 950
+            }
         }
     }
 
@@ -67,23 +77,21 @@ Item {
         anchors.top: indicator.bottom
         anchors.topMargin: 30
 
-        text: getText(Backend.cpuLoad);
+        text: getText(value);
 
         color: "#93a1a1"
 
         font.family: "mono"
         font.pointSize: 26
         textFormat: Text.MarkdownText
-    }
 
-    DropShadow {
-        anchors.fill: text
-
-        horizontalOffset: 0
-        verticalOffset: 12
-        radius: 12.0
-        samples: 6
-        color: "#80000000"
-        source: text
+        layer.enabled: true
+        layer.effect: DropShadow {
+            horizontalOffset: 0
+            verticalOffset: 12
+            radius: 12.0
+            samples: 6
+            color: "#80000000"
+        }
     }
 }

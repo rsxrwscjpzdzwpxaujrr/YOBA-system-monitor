@@ -17,65 +17,41 @@
 
 #include "Backend.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <cstdio>
 #include <sys/sysinfo.h>
 
-#include <QThread>
 #include <QDebug>
 
-Backend::Backend(QObject *parent) : QObject(parent), cpuLoad(0.0f) {}
-
-void
-Backend::start() {
-    QThread* thread = QThread::create([this] {
-        while(true) {
-            FILE* file;
-
-            float a[4];
-            float b[4];
-
-            char fileName[] = "/proc/stat";
-            char formatString[] = "%*s %f %f %f %f";
-
-            file = fopen(fileName, "r");
-            fscanf(file, formatString, &a[0], &a[1], &a[2], &a[3]);
-            fclose(file);
-
-            sleep(1);
-
-            file = fopen(fileName, "r");
-            fscanf(file, formatString, &b[0], &b[1], &b[2], &b[3]);
-            fclose(file);
-
-            cpuLoad = ((b[0] + b[1] + b[2]) - (a[0] + a[1] + a[2])) /
-                      ((b[0] + b[1] + b[2] + b[3]) - (a[0] + a[1] + a[2] + a[3]));
-
-            emit cpuLoadChanged();
-        }
-    });
-
-    thread->start();
+Backend::Backend(QObject *parent) : QObject(parent) {
+    getCpuLoad();
 }
 
 float
 Backend::getCpuLoad() {
-    return cpuLoad;
+    unsigned long temp[4];
+
+    unsigned long oldLoad = load;
+    unsigned long oldTotal = total;
+
+    std::FILE* file = std::fopen("/proc/stat", "r");
+    std::fscanf(file, "%*s %ld %ld %ld %ld", &temp[0], &temp[1], &temp[2], &temp[3]);
+    std::fclose(file);
+
+    load = temp[0] + temp[1] + temp[2];
+    total = load + temp[3];
+
+    return static_cast<float>(load - oldLoad) / (total - oldTotal);
 }
 
 unsigned long
 Backend::getUsedRam() {
     unsigned long usedRam;
-    FILE* file;
 
-    file = fopen("/proc/meminfo", "r");
-    fscanf(file, "%*[^\n]\n%*[^\n]\nMemAvailable:%*[ ]%lu kB", &usedRam);
-    fclose(file);
+    std::FILE* file = std::fopen("/proc/meminfo", "r");
+    std::fscanf(file, "%*[^\n]\n%*[^\n]\nMemAvailable:%*[ ]%lu kB", &usedRam);
+    std::fclose(file);
 
-    usedRam = getTotalRam() - (usedRam * 1024);
-
-    return usedRam;
+    return getTotalRam() - (usedRam * 1024);
 }
 
 unsigned long

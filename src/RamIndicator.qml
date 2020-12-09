@@ -23,10 +23,10 @@ import Backend 1.0
 Item {
     id: root
 
-    property real value: Backend.getUsedRam() / Backend.totalRam;
-
     width: 400
     height: 400
+
+    property real value: Backend.getUsedRam() / Backend.totalRam
 
     Timer {
         id: timer
@@ -36,8 +36,7 @@ Item {
         running: true
 
         onTriggered: {
-            value = Backend.getUsedRam() / Backend.totalRam;
-            anim.start();
+            value = Backend.getUsedRam() / Backend.totalRam
         }
     }
 
@@ -46,12 +45,13 @@ Item {
 
         anchors.horizontalCenter: parent.horizontalCenter
 
-        PropertyAnimation on value {
-            id: anim
+        value: root.value
 
-            easing.type: Easing.InOutQuad
-            duration: 950
-            to: root.value
+        Behavior on value {
+            PropertyAnimation {
+                easing.type: Easing.InOutQuad
+                duration: 950
+            }
         }
     }
 
@@ -82,16 +82,14 @@ Item {
         font.family: "mono"
         font.pointSize: 26
         textFormat: Text.MarkdownText
-    }
 
-    DropShadow {
-        anchors.fill: text
-
-        horizontalOffset: 0
-        verticalOffset: 12
-        radius: 12.0
-        samples: 6
-        color: "#80000000"
-        source: text
+        layer.enabled: true
+        layer.effect: DropShadow {
+            horizontalOffset: 0
+            verticalOffset: 12
+            radius: 12.0
+            samples: 6
+            color: "#80000000"
+        }
     }
 }

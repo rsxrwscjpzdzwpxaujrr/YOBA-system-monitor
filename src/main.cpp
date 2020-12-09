@@ -21,10 +21,8 @@
 
 #include "Backend.hpp"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QGuiApplication app(argc, argv);
 
     qmlRegisterSingletonType<Backend>(
@@ -36,15 +34,23 @@ int main(int argc, char *argv[])
             Q_UNUSED(scriptEngine)
 
             return new Backend(engine);
-        });
+        }
+    );
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/src/main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-        &app, [url](QObject *obj, const QUrl &objUrl) {
+
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreated,
+        &app,
+        [url] (QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
-        }, Qt::QueuedConnection);
+        },
+        Qt::QueuedConnection
+    );
+
     engine.load(url);
 
     return app.exec();

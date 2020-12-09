@@ -45,10 +45,16 @@ Canvas {
 
         radius: size / 2
         color: "#002b36"
-    }
 
-    InnerShadow {
-        z: -1
+        layer.enabled: true
+        layer.effect: InnerShadow {
+            horizontalOffset: 0
+            verticalOffset: 20
+            radius: 40.0
+            samples: 12
+            color: "#30000000"
+        }
+    }
 
         anchors.fill: background
 
@@ -63,11 +69,11 @@ Canvas {
     function drawMarks(ctx) {
         ctx.shadowBlur = 10;
 
-        let strokeStart = markOffset;
-        let strokeEnd = strokeStart + markLength
+        let markStart = markOffset;
         let step = (endAngle - startAngle) / 20;
 
         for (let i = startAngle, line = 0; i <= endAngle; i += step, line++) {
+            let markEnd;
             let halfSize = size / 2;
 
             if (line <= 11) {
@@ -82,25 +88,25 @@ Canvas {
                 ctx.shadowColor = ctx.strokeStyle;
                 ctx.lineWidth = 12
 
-                strokeEnd = strokeStart + markLength
+                markEnd = markStart + markLength
             } else {
                 ctx.shadowColor = "#00000000";
                 ctx.lineWidth = 6
 
                 ctx.strokeStyle = "#60" + ctx.strokeStyle.substring(7, 1);
 
-                strokeEnd = strokeStart + markLength / 2
+                markEnd = markStart + markLength / 2
             }
 
             ctx.beginPath();
             ctx.moveTo(
-                (-Math.sin(i) * (halfSize - strokeStart)),
-                (Math.cos(i) * (halfSize - strokeStart))
+                (-Math.sin(i) * (halfSize - markStart)),
+                ( Math.cos(i) * (halfSize - markStart))
             );
 
             ctx.lineTo(
-                (-Math.sin(i) * (halfSize - strokeEnd)),
-                (Math.cos(i) * (halfSize - strokeEnd))
+                (-Math.sin(i) * (halfSize - markEnd)),
+                ( Math.cos(i) * (halfSize - markEnd))
             );
 
             ctx.stroke();

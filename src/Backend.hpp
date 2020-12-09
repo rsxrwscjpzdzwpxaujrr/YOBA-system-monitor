@@ -21,7 +21,6 @@
 
 class Backend : public QObject {
     Q_OBJECT
-    Q_PROPERTY(float cpuLoad READ getCpuLoad NOTIFY cpuLoadChanged)
     Q_PROPERTY(unsigned long totalRam READ getTotalRam CONSTANT)
 
 public:
@@ -31,12 +30,7 @@ public:
     Q_INVOKABLE unsigned long getUsedRam();
     Q_INVOKABLE unsigned long getTotalRam();
 
-public slots:
-    void start();
-
-signals:
-    void cpuLoadChanged();
-
 private:
-    float cpuLoad;
+    unsigned long load;
+    unsigned long total;
 };
