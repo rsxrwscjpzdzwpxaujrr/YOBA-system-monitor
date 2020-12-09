@@ -17,11 +17,14 @@
 
 #pragma once
 
+#include <QtQml>
 #include <QObject>
 
 class Backend : public QObject {
     Q_OBJECT
     Q_PROPERTY(unsigned long totalRam READ getTotalRam CONSTANT)
+    QML_ELEMENT
+    QML_SINGLETON
 
 public:
     explicit Backend(QObject *parent = nullptr);

@@ -25,18 +25,6 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
-    qmlRegisterSingletonType<Backend>(
-        "Backend",
-        1, 0,
-        "Backend",
-        [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject* {
-            Q_UNUSED(engine)
-            Q_UNUSED(scriptEngine)
-
-            return new Backend(engine);
-        }
-    );
-
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/src/main.qml"));
 
