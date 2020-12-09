@@ -31,7 +31,7 @@ Item {
     Timer {
         id: timer
 
-        interval: 1000
+        interval: 300
         repeat: true
         running: true
 
@@ -50,7 +50,7 @@ Item {
         Behavior on value {
             PropertyAnimation {
                 easing.type: Easing.InOutQuad
-                duration: 950
+                duration: timer.interval - 20
             }
         }
     }
