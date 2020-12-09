@@ -22,7 +22,7 @@ Window {
     id: root
 
     width: 1000
-    height: 520
+    height: 500
 
     maximumHeight: height
     maximumWidth: width

@@ -25,13 +25,10 @@ Canvas {
     property real value: 0.0
 
     width: size
-    height: size * 0.88
+    height: size * ((1 + Math.cos(startAngle * (Math.PI / 180))) / 2) + 10
 
-    property real markLength: 30
-    property real markOffset: 10
-
-    property real startAngle: 45 * (Math.PI / 180)
-    property real endAngle: 315 * (Math.PI / 180)
+    property real startAngle: 51
+    property real endAngle: 360 - startAngle
 
     clip: true
 
@@ -63,19 +60,21 @@ Canvas {
         ctx.translate(size / 2, size / 2);
         ctx.shadowBlur = 10;
 
+        let markLength = 25;
+        let markOffset = 10;
+
         let markStart = markOffset;
         let step = (endAngle - startAngle) / 20;
 
-        for (let i = startAngle, line = 0; i <= endAngle; i += step, line++) {
+        for (let line = 0; line <= 20; line++) {
+            let i = line * step + startAngle;
             let markEnd;
             let halfSize = size / 2;
 
-            if (line <= 11) {
-                ctx.strokeStyle = "#859900";
-            } else if (line > 17) {
-                ctx.strokeStyle = "#dc322f";
+            if (line <= 17) {
+                ctx.strokeStyle = "#268bd2";
             } else {
-                ctx.strokeStyle = "#cb4b16";
+                ctx.strokeStyle = "#dc322f";
             }
 
             if (line % 2 == 0) {
@@ -89,20 +88,19 @@ Canvas {
 
                 ctx.strokeStyle = "#60" + ctx.strokeStyle.substring(7, 1);
 
-                markEnd = markStart + markLength / 2
+                markEnd = markStart + markLength / 2;
             }
 
             ctx.beginPath();
             ctx.moveTo(
-                (-Math.sin(i) * (halfSize - markStart)),
-                ( Math.cos(i) * (halfSize - markStart))
+                (-Math.sin(i * (Math.PI / 180)) * (halfSize - markStart)),
+                ( Math.cos(i * (Math.PI / 180)) * (halfSize - markStart))
             );
 
             ctx.lineTo(
-                (-Math.sin(i) * (halfSize - markEnd)),
-                ( Math.cos(i) * (halfSize - markEnd))
+                (-Math.sin(i * (Math.PI / 180)) * (halfSize - markEnd)),
+                ( Math.cos(i * (Math.PI / 180)) * (halfSize - markEnd))
             );
-
             ctx.stroke();
         }
 
@@ -114,7 +112,7 @@ Canvas {
 
         anchors.fill: parent
 
-        property real angle: (value * (315 - 45)) - 180 + 45
+        property real angle: (value * (endAngle - startAngle)) - 180 + startAngle
 
         transform: Rotation {
             id: rotation
@@ -137,10 +135,10 @@ Canvas {
 
             ctx.beginPath();
 
-            ctx.moveTo( 0,      width + 10);
-            ctx.lineTo( width,  10);
+            ctx.moveTo( 0,      width + 20);
+            ctx.lineTo( width,  20);
             ctx.lineTo( 0,     -length);
-            ctx.lineTo(-width,  10);
+            ctx.lineTo(-width,  20);
 
             ctx.closePath();
 
@@ -152,7 +150,6 @@ Canvas {
 
         layer.enabled: true
         layer.effect: DropShadow {
-            id: shadow
             horizontalOffset: Math.sin(pointer.angle * (Math.PI / 180)) * 6
             verticalOffset: Math.cos(pointer.angle * (Math.PI / 180)) * 6
             radius: 12.0
