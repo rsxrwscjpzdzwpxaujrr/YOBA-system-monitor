@@ -56,17 +56,11 @@ Canvas {
         }
     }
 
-        anchors.fill: background
+    onPaint: {
+        var ctx = getContext("2d");
 
-        horizontalOffset: 0
-        verticalOffset: 20
-        radius: 40.0
-        samples: 12
-        color: "#30000000"
-        source: background
-    }
-
-    function drawMarks(ctx) {
+        ctx.clearRect(0, 0, width, height);
+        ctx.translate(size / 2, size / 2);
         ctx.shadowBlur = 10;
 
         let markStart = markOffset;
@@ -112,42 +106,6 @@ Canvas {
             ctx.stroke();
         }
 
-        ctx.shadowColor = "#00000000";
-    }
-
-    function drawPointer(ctx) {
-        let halfSize = size / 2;
-        let length = halfSize * 0.9;
-        let width = 20;
-        let angle = startAngle + (value * (endAngle - startAngle)) - Math.PI
-
-        ctx.save();
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-
-        ctx.moveTo(0, width + 10);
-        ctx.lineTo(width, 10);
-        ctx.lineTo(0, -length);
-        ctx.lineTo(-width, 10);
-
-        ctx.closePath();
-
-        ctx.fillStyle = "#d33682"
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    onPaint: {
-        var ctx = getContext("2d");
-
-        ctx.clearRect(0, 0, width, height);
-        ctx.translate(size / 2, size / 2);
-        ctx.lineWidth = 12
-
-        drawMarks(ctx);
-
         ctx.translate(-size / 2, -size / 2);
     }
 
@@ -156,31 +114,50 @@ Canvas {
 
         anchors.fill: parent
 
+        property real angle: (value * (315 - 45)) - 180 + 45
+
+        transform: Rotation {
+            id: rotation
+
+            origin.x: size / 2
+            origin.y: size / 2
+
+            angle: pointer.angle
+        }
+
         onPaint: {
             var ctx = getContext("2d");
 
-            ctx.clearRect(0, 0, width, height);
+            ctx.clearRect(0, 0, pointer.width, pointer.height);
             ctx.translate(size / 2, size / 2);
-            ctx.lineWidth = 12
 
-            drawPointer(ctx);
+            let halfSize = size / 2;
+            let length = halfSize * 0.9;
+            let width = 20;
+
+            ctx.beginPath();
+
+            ctx.moveTo( 0,      width + 10);
+            ctx.lineTo( width,  10);
+            ctx.lineTo( 0,     -length);
+            ctx.lineTo(-width,  10);
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#d33682"
+            ctx.fill();
 
             ctx.translate(-size / 2, -size / 2);
         }
-    }
 
-    onValueChanged: {
-        pointer.requestPaint();
-    }
-
-    DropShadow {
-        anchors.fill: pointer
-
-        horizontalOffset: 0
-        verticalOffset: 6
-        radius: 12.0
-        samples: 6
-        color: "#40000000"
-        source: pointer
+        layer.enabled: true
+        layer.effect: DropShadow {
+            id: shadow
+            horizontalOffset: Math.sin(pointer.angle * (Math.PI / 180)) * 6
+            verticalOffset: Math.cos(pointer.angle * (Math.PI / 180)) * 6
+            radius: 12.0
+            samples: 6
+            color: "#40000000"
+        }
     }
 }
