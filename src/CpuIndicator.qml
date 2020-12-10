@@ -59,30 +59,92 @@ Item {
         }
     }
 
-    function getText(value) {
-        let text;
-
-        if (value > 0.9)
-            text = `CPU: **${(value * 100).toFixed(1)}%**`;
-        else
-            text = `CPU: ${(value * 100).toFixed(1)}%`;
-
-        return text;
-    }
-
-    Text {
-        id: text
+    Rectangle {
+        id: display
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: indicator.bottom
         anchors.topMargin: 30
 
-        text: getText(value);
+        color: "#002b36"
+
+        width: inDisplay.width + 40
+        height: inDisplay.height + 30
+
+        NineSegDisp {
+            id: inDisplay
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            height: 50
+            segmentWidth: 5.5
+
+            color: root.value > 0.8 ? "#fa4441" : "#3d9adb"
+            offColor: "#18" + color.toString().substring(7, 1)
+
+            value: Math.round(root.value * 1000)
+            digits: 3
+
+            point1: root.value <= 100 ? 1 : -1
+
+            layer.enabled: true
+            layer.effect: Glow {
+                radius: 15
+                samples: 13
+                color: inDisplay.color
+                spread: 0
+            }
+        }
+
+        layer.enabled: true
+        layer.effect: InnerShadow {
+            horizontalOffset: 0
+            verticalOffset: 20
+            radius: 40.0
+            samples: 12
+            color: "#30000000"
+        }
+    }
+
+    Text {
+        id: text
+
+        anchors.verticalCenter: display.verticalCenter
+        anchors.right: display.left
+        anchors.rightMargin: 10
+
+        text: "CPU: "
 
         color: "#93a1a1"
 
         font.family: "mono"
-        font.pointSize: 26
+        font.pointSize: 28
+        textFormat: Text.MarkdownText
+
+        layer.enabled: true
+        layer.effect: DropShadow {
+            horizontalOffset: 0
+            verticalOffset: 12
+            radius: 12.0
+            samples: 6
+            color: "#80000000"
+        }
+    }
+
+    Text {
+        id: text2
+
+        anchors.verticalCenter: display.verticalCenter
+        anchors.left: display.right
+        anchors.leftMargin: 15
+
+        text: " %"
+
+        color: "#93a1a1"
+
+        font.family: "mono"
+        font.pointSize: 28
         textFormat: Text.MarkdownText
 
         layer.enabled: true

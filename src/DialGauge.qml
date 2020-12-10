@@ -25,7 +25,7 @@ Canvas {
     property real value: 0.0
 
     width: size
-    height: size * ((1 + Math.cos(startAngle * (Math.PI / 180))) / 2) + 10
+    height: Math.round(size * ((1 + Math.cos(startAngle * (Math.PI / 180))) / 2) + 10)
 
     property real startAngle: 51
     property real endAngle: 360 - startAngle
@@ -71,7 +71,7 @@ Canvas {
             let markEnd;
             let halfSize = size / 2;
 
-            if (line <= 17) {
+            if (line <= 15) {
                 ctx.strokeStyle = "#268bd2";
             } else {
                 ctx.strokeStyle = "#dc322f";

@@ -27,11 +27,13 @@ class Backend : public QObject {
     QML_SINGLETON
 
 public:
-    explicit Backend(QObject *parent = nullptr);
+    explicit Backend(QObject* parent=nullptr);
 
-    Q_INVOKABLE float getCpuLoad();
-    Q_INVOKABLE unsigned long getUsedRam();
     Q_INVOKABLE unsigned long getTotalRam();
+
+public slots:
+    float getCpuLoad();
+    unsigned long getUsedRam();
 
 private:
     unsigned long load;

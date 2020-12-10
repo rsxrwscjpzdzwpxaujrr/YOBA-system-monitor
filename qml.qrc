@@ -4,5 +4,6 @@
         <file>src/DialGauge.qml</file>
         <file>src/CpuIndicator.qml</file>
         <file>src/RamIndicator.qml</file>
+        <file>src/NineSegDisp.qml</file>
     </qresource>
 </RCC>

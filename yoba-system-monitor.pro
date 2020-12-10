@@ -10,10 +10,14 @@ INCLUDEPATH += src
 
 SOURCES += \
         src/Backend.cpp \
+        src/NineSegDigit.cpp \
+        src/Segment.cpp \
         src/main.cpp
 
 HEADERS += \
     src/Backend.hpp \
+    src/NineSegDigit.hpp \
+    src/Segment.hpp
 
 RESOURCES += qml.qrc
 

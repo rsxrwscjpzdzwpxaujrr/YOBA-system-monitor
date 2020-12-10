@@ -17,12 +17,13 @@
 
 import QtQuick 2.12
 import QtQuick.Window 2.12
+import Local 1.0
 
 Window {
     id: root
 
     width: 1000
-    height: 500
+    height: 550
 
     maximumHeight: height
     maximumWidth: width
@@ -41,7 +42,7 @@ Window {
         anchors.left: parent.left
         anchors.top: parent.top
 
-        anchors.margins: 50
+        anchors.margins: 60
 
         ScaleAnimator on scale {
             from: 0.5
@@ -70,7 +71,7 @@ Window {
         anchors.top: parent.top
         anchors.right: parent.right
 
-        anchors.margins: 50
+        anchors.margins: 60
 
         ScaleAnimator on scale {
             from: 0.5
