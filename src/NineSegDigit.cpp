@@ -78,7 +78,7 @@ NineSegDigit::paint(QPainter* painter) {
 
     for (int i = 0; i < 9; i++) {
         painter->setBrush(segments[i]->color());
-        painter->drawPolygon(segments[i]->pol());
+        painter->drawConvexPolygon(segments[i]->pol());
     }
 }
 
