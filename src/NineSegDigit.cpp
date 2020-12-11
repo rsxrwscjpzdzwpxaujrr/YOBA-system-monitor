@@ -49,7 +49,7 @@ NineSegDigit::~NineSegDigit() {
 
 void
 NineSegDigit::paint(QPainter* painter) {
-    if (!segments[0])
+    if (Q_UNLIKELY(!segments[0]))
         return;
 
     painter->setPen(Qt::PenStyle::NoPen);
@@ -85,12 +85,12 @@ void
 NineSegDigit::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) {
     QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
 
-    if (newGeometry.height() == oldGeometry.height())
+    if (Q_UNLIKELY(newGeometry.height() == oldGeometry.height()))
         return;
 
     updateSizes();
 
-    if (!acquireSegments())
+    if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     initSegments();
@@ -160,10 +160,10 @@ NineSegDigit::updateSizes() {
 
 bool
 NineSegDigit::acquireSegments() {
-    if (segments[0])
+    if (Q_UNLIKELY(segments[0]))
         return true;
 
-    if (segmentLength < 0.0f || segmentWidth < 0.0f || off < 0.0f)
+    if (Q_UNLIKELY(segmentLength < 0.0f || segmentWidth < 0.0f || off < 0.0f))
         return false;
 
     for (int i = 0; i < 9; i++) {
@@ -179,7 +179,7 @@ NineSegDigit::acquireSegments() {
 
 void
 NineSegDigit::initSegments() {
-    if (!segments[0] || segmentLength < 0.0f || segmentWidth < 0.0f) {
+    if (Q_UNLIKELY(!segments[0] || segmentLength < 0.0f || segmentWidth < 0.0f)) {
         return;
     }
 
@@ -220,7 +220,7 @@ void
 NineSegDigit::setDigit(QChar digit) {
     NineSegDigit::digit = digit;
 
-    if (!acquireSegments())
+    if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     switch (digit.toLatin1()) {
@@ -374,7 +374,7 @@ void
 NineSegDigit::setColor(const QColor& color) {
     NineSegDigit::color = color;
 
-    if (!acquireSegments())
+    if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     setDigit(digit);
@@ -384,7 +384,7 @@ void
 NineSegDigit::setOffColor(const QColor& offColor) {
     NineSegDigit::offColor = offColor;
 
-    if (!acquireSegments())
+    if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     setDigit(digit);
@@ -405,7 +405,7 @@ NineSegDigit::setSegmentWidth(float segmentWidth) {
     off = segmentWidth / 6.0f;
     pointSize = segmentWidth * 1.333f;
 
-    if (!acquireSegments())
+    if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     initSegments();
@@ -413,7 +413,7 @@ NineSegDigit::setSegmentWidth(float segmentWidth) {
 
 void
 NineSegDigit::setShift(float shift) {
-    if (NineSegDigit::shift == shift)
+    if (Q_UNLIKELY(NineSegDigit::shift == shift))
         return;
 
     NineSegDigit::shift = shift;

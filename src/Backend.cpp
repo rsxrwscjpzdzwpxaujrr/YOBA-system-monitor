@@ -58,7 +58,7 @@ unsigned long
 Backend::getTotalRam() {
     struct sysinfo info;
 
-    if (sysinfo(&info) == 0) {
+    if (Q_LIKELY(sysinfo(&info) == 0)) {
         return info.totalram;
     } else {
         qDebug() << "RAM getting error";

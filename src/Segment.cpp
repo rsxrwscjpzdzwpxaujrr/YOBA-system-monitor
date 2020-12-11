@@ -43,18 +43,18 @@ Segment::setColor(const QColor& color) {
 
 void
 Segment::setEndColor(const QColor& endColor) {
-    if (m_endColor == endColor)
+    if (Q_UNLIKELY(m_endColor == endColor))
         return;
 
     m_endColor = endColor;
     emit endColorChanged();
 
-    if (animation.duration() == 0) {
+    if (Q_UNLIKELY(animation.duration() == 0)) {
         setColor(endColor);
         return;
     }
 
-    if (animation.state() == QPropertyAnimation::State::Running) {
+    if (Q_LIKELY(animation.state() == QPropertyAnimation::State::Running)) {
         int time = animation.currentTime();
         animation.stop();
         animation.setCurrentTime(time);
