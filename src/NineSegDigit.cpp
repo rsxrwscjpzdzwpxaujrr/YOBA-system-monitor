@@ -21,6 +21,7 @@
 #include <QPen>
 #include <QTransform>
 #include <QObject>
+#include <QtMath>
 
 #include "Segment.hpp"
 
@@ -29,17 +30,14 @@ NineSegDigit::NineSegDigit(QQuickItem* parent) :
             digit(' '),
             color(0.0f, 0.0f, 0.0f, 0),
             offColor(0.0f, 0.0f, 0.0f, 0),
-            segmentLength(0.0f),
-            segmentWidth(0.0f),
-            off(0.0f) {
+            segmentLength(-1.0f),
+            segmentWidth(-1.0f),
+            off(-1.0f),
+            shift(0.25f) {
     setAntialiasing(true);
 
     for (int i = 0; i < 9; i++) {
-        segments[i] = new Segment(offColor, 600, QEasingCurve::OutExpo, this);
-
-        QObject::connect(segments[i], &Segment::colorChanged, this, [this] {
-            update();
-        });
+        segments[i] = nullptr;
     }
 }
 
@@ -51,9 +49,10 @@ NineSegDigit::~NineSegDigit() {
 
 void
 NineSegDigit::paint(QPainter* painter) {
-    painter->setPen(Qt::PenStyle::NoPen);
+    if (!segments[0])
+        return;
 
-    float shift = 0.25f;
+    painter->setPen(Qt::PenStyle::NoPen);
 
     painter->setBrush(point ? color : offColor);
 
@@ -89,11 +88,12 @@ NineSegDigit::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeomet
     if (newGeometry.height() == oldGeometry.height())
         return;
 
-    segmentLength = (newGeometry.height() - segmentWidth) / 2.0f;
+    updateSizes();
 
-    setWidth(segmentLength * 1.8f);
+    if (!acquireSegments())
+        return;
 
-    initPols();
+    initSegments();
 }
 
 QPolygonF
@@ -153,8 +153,33 @@ NineSegDigit::weirdSegment() {
 }
 
 void
-NineSegDigit::initPols() {
-    if (segmentLength == 0.0f || segmentWidth == 0.0f) {
+NineSegDigit::updateSizes() {
+    segmentLength = (height() - segmentWidth) / 2.0f;
+    setWidth(segmentLength * 1.33f + segmentLength * (qAbs(shift) * 2.0f));
+}
+
+bool
+NineSegDigit::acquireSegments() {
+    if (segments[0])
+        return true;
+
+    if (segmentLength < 0.0f || segmentWidth < 0.0f || off < 0.0f)
+        return false;
+
+    for (int i = 0; i < 9; i++) {
+        segments[i] = new Segment(offColor, 600, QEasingCurve::OutExpo, this);
+
+        QObject::connect(segments[i], &Segment::colorChanged, this, [this] {
+            update();
+        });
+    }
+
+    return true;
+}
+
+void
+NineSegDigit::initSegments() {
+    if (!segments[0] || segmentLength < 0.0f || segmentWidth < 0.0f) {
         return;
     }
 
@@ -194,6 +219,9 @@ NineSegDigit::initPols() {
 void
 NineSegDigit::setDigit(QChar digit) {
     NineSegDigit::digit = digit;
+
+    if (!acquireSegments())
+        return;
 
     switch (digit.toLatin1()) {
     case '0':
@@ -346,12 +374,18 @@ void
 NineSegDigit::setColor(const QColor& color) {
     NineSegDigit::color = color;
 
+    if (!acquireSegments())
+        return;
+
     setDigit(digit);
 }
 
 void
 NineSegDigit::setOffColor(const QColor& offColor) {
     NineSegDigit::offColor = offColor;
+
+    if (!acquireSegments())
+        return;
 
     setDigit(digit);
 }
@@ -371,5 +405,18 @@ NineSegDigit::setSegmentWidth(float segmentWidth) {
     off = segmentWidth / 6.0f;
     pointSize = segmentWidth * 1.333f;
 
-    initPols();
+    if (!acquireSegments())
+        return;
+
+    initSegments();
+}
+
+void
+NineSegDigit::setShift(float shift) {
+    if (NineSegDigit::shift == shift)
+        return;
+
+    NineSegDigit::shift = shift;
+
+    initSegments();
 }

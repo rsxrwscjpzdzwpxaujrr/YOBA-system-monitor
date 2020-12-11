@@ -59,18 +59,26 @@ Item {
         let totalRam = Backend.totalRam / (1024 * 1024 * 1024);
         let usedRam = Backend.getUsedRam() / (1024 * 1024 * 1024);
 
-        totalRam = Math.round(totalRam * 10).toString();
-        usedRam = Math.round(usedRam * 10).toString();
+        let totalRamStr = Math.round(totalRam * 10).toString();
+        let usedRamStr = Math.round(usedRam * 10).toString();
 
-        while (totalRam.length < 3) {
-            totalRam = " " + totalRam;
+        if (totalRam < 1) {
+            totalRamStr = "0" + totalRamStr;
         }
 
-        while (usedRam.length < 3) {
-            usedRam = " " + usedRam;
+        if (usedRam < 1) {
+            usedRamStr = "0" + usedRamStr;
         }
 
-        return `${usedRam}/${totalRam}`;
+        while (totalRamStr.length < 3) {
+            totalRamStr = " " + totalRamStr;
+        }
+
+        while (usedRamStr.length < 3) {
+            usedRamStr = " " + usedRamStr;
+        }
+
+        return `${usedRamStr}/${totalRamStr}`;
     }
 
     Rectangle {

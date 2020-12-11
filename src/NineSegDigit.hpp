@@ -26,11 +26,12 @@ class Segment;
 
 class NineSegDigit : public QQuickPaintedItem {
     Q_OBJECT
-    Q_PROPERTY(float  segmentWidth MEMBER segmentWidth WRITE setSegmentWidth)
     Q_PROPERTY(QChar  digit        MEMBER digit        WRITE setDigit)
     Q_PROPERTY(bool   point        MEMBER point        WRITE setPoint)
-    Q_PROPERTY(QColor color        MEMBER color        WRITE setColor)
-    Q_PROPERTY(QColor offColor     MEMBER offColor     WRITE setOffColor)
+    Q_PROPERTY(float  shift        MEMBER shift        WRITE setShift)
+    Q_PROPERTY(QColor color        MEMBER color        WRITE setColor        REQUIRED)
+    Q_PROPERTY(QColor offColor     MEMBER offColor     WRITE setOffColor     REQUIRED)
+    Q_PROPERTY(float  segmentWidth MEMBER segmentWidth WRITE setSegmentWidth REQUIRED)
     QML_ELEMENT
 
 public:
@@ -48,6 +49,7 @@ public slots:
     void setOffColor(const QColor& offColor);
     void setPoint(bool point);
     void setSegmentWidth(float segmentWidth);
+    void setShift(float shift);
 
 private:
     Segment* segments[9];
@@ -62,10 +64,13 @@ private:
     float segmentWidth;
     float pointSize;
     float off;
+    float shift;
 
     QPolygonF verticalSegment();
     QPolygonF horizontalSegment();
     QPolygonF weirdSegment();
 
-    void initPols();
+    void updateSizes();
+    bool acquireSegments();
+    void initSegments();
 };

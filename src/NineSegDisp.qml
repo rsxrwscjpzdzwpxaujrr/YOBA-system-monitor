@@ -33,7 +33,7 @@ ListView {
     property real segmentWidth: 5.5
 
     model: ListModel {
-        id: disps
+        id: model
     }
 
     function update() {
@@ -44,7 +44,7 @@ ListView {
         }
 
         for (let i = 0; i < digits; i++) {
-            disps.set(i, { "numbere": value[i], "pointe": i === point1 | i === point2 });
+            model.set(i, { "digit": value[i], "point": i === point1 | i === point2 });
         }
     }
 
@@ -60,8 +60,8 @@ ListView {
     delegate: NineSegDigit {
         id: display
 
-        digit: numbere
-        point: pointe
+        digit: model.digit
+        point: model.point
 
         segmentWidth: root.segmentWidth
 
