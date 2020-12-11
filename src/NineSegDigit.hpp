@@ -24,7 +24,7 @@
 
 class Segment;
 
-class NineSegDigit : public QQuickPaintedItem {
+class NineSegDigit : public QQuickItem {
     Q_OBJECT
     Q_PROPERTY(QChar  digit        MEMBER digit        WRITE setDigit)
     Q_PROPERTY(bool   point        MEMBER point        WRITE setPoint)
@@ -38,10 +38,9 @@ public:
     NineSegDigit(QQuickItem* parent=nullptr);
     ~NineSegDigit();
 
-    void paint(QPainter* painter) override;
-
 protected:
     void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+    QSGNode* updatePaintNode(QSGNode* node, UpdatePaintNodeData*) override;
 
 public slots:
     void setDigit(QChar digit);
@@ -52,7 +51,12 @@ public slots:
     void setShift(float shift);
 
 private:
-    Segment* segments[9];
+    const int segmentCount;
+
+    Segment* segments[10];
+    bool valid[10];
+    bool geometryValid;
+    bool shiftValid;
 
     QChar digit;
     bool point;

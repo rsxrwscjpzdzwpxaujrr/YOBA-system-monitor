@@ -36,6 +36,9 @@ Segment::color() const {
 
 void
 Segment::setColor(const QColor& color) {
+    if (Q_UNLIKELY(m_color == color))
+        return;
+
     m_color = color;
 
     emit colorChanged();
@@ -69,8 +72,8 @@ Segment::setPol(const QPolygonF& polygon) {
     m_pol = polygon;
 }
 
-QPolygonF
-Segment::pol() const {
+QPolygonF&
+Segment::pol() {
     return m_pol;
 }
 

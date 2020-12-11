@@ -37,7 +37,7 @@ public:
     );
 
     QColor color() const;
-    QPolygonF pol() const;
+    QPolygonF& pol();
     QColor endColor() const;
 
 public slots:

@@ -77,7 +77,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
 
-            height: 50
+            height: 51
             segmentWidth: 5.5
 
             color: root.value > 0.8 ? "#fa4441" : "#3d9adb"

@@ -24,6 +24,10 @@
 int main(int argc, char *argv[]) {
     qputenv("QSG_RENDER_LOOP", "basic");
 
+    QSurfaceFormat format;
+    format.setSamples(4);
+    QSurfaceFormat::setDefaultFormat(format);
+
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 

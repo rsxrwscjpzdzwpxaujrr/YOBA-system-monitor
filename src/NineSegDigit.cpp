@@ -18,15 +18,19 @@
 #include "NineSegDigit.hpp"
 
 #include <QEasingCurve>
-#include <QPen>
-#include <QTransform>
 #include <QObject>
 #include <QtMath>
+#include <QSGNode>
+#include <QSGFlatColorMaterial>
+#include <QMatrix4x4>
 
 #include "Segment.hpp"
 
 NineSegDigit::NineSegDigit(QQuickItem* parent) :
-            QQuickPaintedItem(parent),
+            QQuickItem(parent),
+            segmentCount(10),
+            geometryValid(false),
+            shiftValid(false),
             digit(' '),
             color(0.0f, 0.0f, 0.0f, 0),
             offColor(0.0f, 0.0f, 0.0f, 0),
@@ -34,56 +38,23 @@ NineSegDigit::NineSegDigit(QQuickItem* parent) :
             segmentWidth(-1.0f),
             off(-1.0f),
             shift(0.25f) {
-    setAntialiasing(true);
-
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < segmentCount; i++) {
+        valid[i] = false;
         segments[i] = nullptr;
     }
+
+    setFlag(ItemHasContents, true);
 }
 
 NineSegDigit::~NineSegDigit() {
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < segmentCount; i++) {
         delete segments[i];
     }
 }
 
 void
-NineSegDigit::paint(QPainter* painter) {
-    if (Q_UNLIKELY(!segments[0]))
-        return;
-
-    painter->setPen(Qt::PenStyle::NoPen);
-
-    painter->setBrush(point ? color : offColor);
-
-    painter->drawEllipse({
-             segmentLength + (segmentWidth * 1.2f) + pointSize * 0.75f,
-             segmentLength * 2.0f + segmentWidth - pointSize * 0.5f
-         },
-         pointSize / 2.0f,
-         pointSize / 2.0f
-    );
-
-    painter->setTransform(
-        QTransform(
-            1.0f,   0.0f,
-            -shift, 1.0f,
-            1.0f,   1.0f
-        ),
-        true
-    );
-
-    painter->translate(segmentLength * (shift * 2.0f), 0.0f);
-
-    for (int i = 0; i < 9; i++) {
-        painter->setBrush(segments[i]->color());
-        painter->drawConvexPolygon(segments[i]->pol());
-    }
-}
-
-void
 NineSegDigit::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) {
-    QQuickPaintedItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
 
     if (Q_UNLIKELY(newGeometry.height() == oldGeometry.height()))
         return;
@@ -166,10 +137,12 @@ NineSegDigit::acquireSegments() {
     if (Q_UNLIKELY(segmentLength < 0.0f || segmentWidth < 0.0f || off < 0.0f))
         return false;
 
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < segmentCount; i++) {
         segments[i] = new Segment(offColor, 600, QEasingCurve::OutExpo, this);
 
-        QObject::connect(segments[i], &Segment::colorChanged, this, [this] {
+        QObject::connect(segments[i], &Segment::colorChanged, this, [this, i] {
+            valid[i] = false;
+
             update();
         });
     }
@@ -186,34 +159,140 @@ NineSegDigit::initSegments() {
     QPolygonF horPol = horizontalSegment();
     QPolygonF verPol = verticalSegment();
 
-    QPolygonF pols[9];
+    segments[0]->pol() = horPol;
+    segments[3]->pol() = horPol;
+    segments[6]->pol() = horPol;
 
-    pols[0] = horPol;
-    pols[3] = horPol;
-    pols[6] = horPol;
+    segments[1]->pol() = verPol;
+    segments[2]->pol() = verPol;
+    segments[4]->pol() = verPol;
+    segments[5]->pol() = verPol;
 
-    pols[1] = verPol;
-    pols[2] = verPol;
-    pols[4] = verPol;
-    pols[5] = verPol;
+    segments[1]->pol().translate(segmentLength, 0.0f);
+    segments[2]->pol().translate(segmentLength, segmentLength);
+    segments[3]->pol().translate(0.0,           segmentLength * 2.0f);
+    segments[4]->pol().translate(0.0,           segmentLength);
+    segments[6]->pol().translate(0.0,           segmentLength);
 
-    pols[1].translate(segmentLength, 0.0f);
-    pols[2].translate(segmentLength, segmentLength);
-    pols[3].translate(0.0,           segmentLength * 2.0f);
-    pols[4].translate(0.0,           segmentLength);
-    pols[6].translate(0.0,           segmentLength);
+    segments[7]->pol() = weirdSegment();
 
-    pols[7] = weirdSegment();
-
-    for (QPointF p: pols[7]) {
-        pols[8].append(QPointF(segmentLength - p.x(), segmentLength - p.y()));
+    for (QPointF p: segments[7]->pol()) {
+        segments[8]->pol().append(QPointF(segmentLength - p.x(), segmentLength - p.y()));
     }
 
-    pols[8].translate(segmentWidth, segmentLength + segmentWidth);
+    segments[8]->pol().translate(segmentWidth, segmentLength + segmentWidth);
 
-    for (int i = 0; i < 9; i++) {
-        segments[i]->setPol(pols[i]);
+    for (int i = 0; i < 6; i++) {
+        segments[9]->pol().append({
+            qCos((M_PI / 3.0f) * i) * pointSize / 2.0f,
+            qSin((M_PI / 3.0f) * i) * pointSize / 2.0f
+        });
     }
+
+    segments[9]->pol().translate(
+        segmentLength + (segmentWidth * 1.2f) + pointSize * 0.75f,
+        segmentLength * 2.0f + segmentWidth - pointSize * 0.5f
+    );
+
+    geometryValid = false;
+
+    update();
+}
+
+QSGNode*
+NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
+    if (Q_UNLIKELY(!acquireSegments()))
+        return nullptr;
+
+    if (Q_UNLIKELY(!node)) {
+        node = new QSGNode;
+
+        QSGTransformNode* tnode = new QSGTransformNode;
+
+        for (int i = 0; i < segmentCount; i++) {
+            QSGGeometryNode* inode = new QSGGeometryNode;
+            QSGGeometry *geometry =
+                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), (i > 6 && i != 9) ? 9 : 12);
+
+            geometry->setDrawingMode(QSGGeometry::DrawTriangles);
+            geometry->setVertexDataPattern(QSGGeometry::DataPattern::StaticPattern);
+            geometry->markVertexDataDirty();
+
+            inode->setGeometry(geometry);
+
+            QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
+
+            material->setColor(segments[i]->color());
+            inode->setMaterial(material);
+
+            inode->setFlag(QSGNode::OwnsMaterial);
+            inode->setFlag(QSGNode::OwnsGeometry);
+
+            tnode->appendChildNode(inode);
+            inode->setFlag(QSGNode::OwnedByParent);
+            tnode->markDirty(QSGNode::DirtyNodeAdded);
+        }
+
+        node->appendChildNode(tnode);
+        tnode->setFlag(QSGNode::OwnedByParent);
+        node->markDirty(QSGNode::DirtyNodeAdded);
+    }
+
+    QSGTransformNode* tnode = static_cast<QSGTransformNode*>(node->firstChild());
+
+    if (Q_UNLIKELY(!shiftValid)) {
+        QMatrix4x4 matrix(
+            1.0f, -shift, 0.0f, 0.0f,
+            0.0f, 1.0f,   0.0f, 0.0f,
+            0.0f, 0.0f,   1.0f, 0.0f,
+            0.0f, 0.0f,   0.0f, 1.0f
+        );
+
+        matrix.translate(segmentLength * (shift * 2.0f), 0.0f);
+        tnode->setMatrix(matrix);
+        tnode->markDirty(QSGNode::DirtyMatrix);
+
+        shiftValid = true;
+    }
+
+    if (Q_UNLIKELY(!geometryValid)) {
+        for (int i = 0; i < segmentCount; i++) {
+            QSGGeometryNode* inode =
+                static_cast<QSGGeometryNode*>(node->firstChild()->childAtIndex(i));
+
+            QSGGeometry::Point2D* vertices = inode->geometry()->vertexDataAsPoint2D();
+            QPolygonF pol = segments[i]->pol();
+
+            for (int k = 2, j = 0; k < pol.size(); k++, j += 3) {
+                vertices[j    ].set(pol.value(0    ).x(), pol.value(0    ).y());
+                vertices[j + 1].set(pol.value(k - 1).x(), pol.value(k - 1).y());
+                vertices[j + 2].set(pol.value(k    ).x(), pol.value(k    ).y());
+            }
+
+            inode->markDirty(QSGNode::DirtyGeometry);
+        }
+
+        geometryValid = true;
+    }
+
+    for (int i = 0; i < segmentCount; i++) {
+        if (valid[i])
+            continue;
+
+        QSGGeometryNode* inode =
+            static_cast<QSGGeometryNode*>(tnode->childAtIndex(i));
+
+        QSGFlatColorMaterial* material =
+            static_cast<QSGFlatColorMaterial*>(inode->material());
+
+        material->setColor(segments[i]->color());
+
+        inode->markDirty(QSGNode::DirtyMaterial);
+
+        valid[i] = true;
+    }
+
+    return node;
 }
 
 void
@@ -368,6 +447,8 @@ NineSegDigit::setDigit(QChar digit) {
         segments[8]->setEndColor(offColor);
         break;
     }
+
+    setPoint(point);
 }
 
 void
@@ -393,6 +474,11 @@ NineSegDigit::setOffColor(const QColor& offColor) {
 void
 NineSegDigit::setPoint(bool point) {
     NineSegDigit::point = point;
+
+    if (Q_UNLIKELY(!acquireSegments()))
+        return;
+
+    segments[9]->setEndColor(point ? color : offColor);
 }
 
 void
@@ -418,5 +504,9 @@ NineSegDigit::setShift(float shift) {
 
     NineSegDigit::shift = shift;
 
-    initSegments();
+    shiftValid = false;
+
+    updateSizes();
+
+    update();
 }
