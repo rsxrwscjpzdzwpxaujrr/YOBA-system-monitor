@@ -40,7 +40,7 @@ public:
 
 protected:
     void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
-    QSGNode* updatePaintNode(QSGNode* node, UpdatePaintNodeData*) override;
+    QSGNode* updatePaintNode(QSGNode* node, UpdatePaintNodeData* data) override;
 
 public slots:
     void setDigit(QChar digit);

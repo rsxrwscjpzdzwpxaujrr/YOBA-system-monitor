@@ -200,27 +200,29 @@ NineSegDigit::initSegments() {
 }
 
 QSGNode*
-NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
+NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData* data) {
     if (Q_UNLIKELY(!acquireSegments()))
         return nullptr;
 
     if (Q_UNLIKELY(!node)) {
         node = new QSGNode;
 
-        QSGTransformNode* tnode = new QSGTransformNode;
-
         for (int i = 0; i < segmentCount; i++) {
-            QSGGeometryNode* inode = new QSGGeometryNode;
-            QSGGeometry *geometry =
-                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), (i > 6 && i != 9) ? 9 : 12);
+            auto inode = new QSGGeometryNode;
+            auto geometry = new QSGGeometry(
+                QSGGeometry::defaultAttributes_Point2D(),
+                (i > 6 && i != 9) ? 9 : 12
+            );
 
             geometry->setDrawingMode(QSGGeometry::DrawTriangles);
             geometry->setVertexDataPattern(QSGGeometry::DataPattern::StaticPattern);
+            geometry->setIndexDataPattern(QSGGeometry::DataPattern::StaticPattern);
             geometry->markVertexDataDirty();
+            geometry->markIndexDataDirty();
 
             inode->setGeometry(geometry);
 
-            QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
+            auto material = new QSGFlatColorMaterial;
 
             material->setColor(segments[i]->color());
             inode->setMaterial(material);
@@ -228,19 +230,14 @@ NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
             inode->setFlag(QSGNode::OwnsMaterial);
             inode->setFlag(QSGNode::OwnsGeometry);
 
-            tnode->appendChildNode(inode);
-            inode->setFlag(QSGNode::OwnedByParent);
-            tnode->markDirty(QSGNode::DirtyNodeAdded);
+            node->appendChildNode(inode);
+            node->setFlag(QSGNode::OwnedByParent);
+            node->markDirty(QSGNode::DirtyNodeAdded);
         }
-
-        node->appendChildNode(tnode);
-        tnode->setFlag(QSGNode::OwnedByParent);
-        node->markDirty(QSGNode::DirtyNodeAdded);
     }
 
-    QSGTransformNode* tnode = static_cast<QSGTransformNode*>(node->firstChild());
-
     if (Q_UNLIKELY(!shiftValid)) {
+        QSGTransformNode* tnode = data->transformNode;
         QMatrix4x4 matrix(
             1.0f, -shift, 0.0f, 0.0f,
             0.0f, 1.0f,   0.0f, 0.0f,
@@ -249,7 +246,8 @@ NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
         );
 
         matrix.translate(segmentLength * (shift * 2.0f), 0.0f);
-        tnode->setMatrix(matrix);
+
+        tnode->setMatrix(tnode->matrix() * matrix);
         tnode->markDirty(QSGNode::DirtyMatrix);
 
         shiftValid = true;
@@ -257,11 +255,10 @@ NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
 
     if (Q_UNLIKELY(!geometryValid)) {
         for (int i = 0; i < segmentCount; i++) {
-            QSGGeometryNode* inode =
-                static_cast<QSGGeometryNode*>(node->firstChild()->childAtIndex(i));
+            auto inode = static_cast<QSGGeometryNode*>(node->childAtIndex(i));
 
             QSGGeometry::Point2D* vertices = inode->geometry()->vertexDataAsPoint2D();
-            QPolygonF pol = segments[i]->pol();
+            QPolygonF& pol = segments[i]->pol();
 
             for (int k = 2, j = 0; k < pol.size(); k++, j += 3) {
                 vertices[j    ].set(pol.value(0    ).x(), pol.value(0    ).y());
@@ -279,11 +276,8 @@ NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData*) {
         if (valid[i])
             continue;
 
-        QSGGeometryNode* inode =
-            static_cast<QSGGeometryNode*>(tnode->childAtIndex(i));
-
-        QSGFlatColorMaterial* material =
-            static_cast<QSGFlatColorMaterial*>(inode->material());
+        auto inode    = static_cast<QSGGeometryNode*>(node->childAtIndex(i));
+        auto material = static_cast<QSGFlatColorMaterial*>(inode->material());
 
         material->setColor(segments[i]->color());
 
