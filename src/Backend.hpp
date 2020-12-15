@@ -28,6 +28,7 @@ class Backend : public QObject {
 
 public:
     explicit Backend(QObject* parent=nullptr);
+    ~Backend();
 
     Q_INVOKABLE unsigned long getTotalRam();
 
@@ -36,6 +37,9 @@ public slots:
     unsigned long getUsedRam();
 
 private:
+    QFile proc_stat;
+    QFile meminfo;
+
     unsigned long load;
     unsigned long total;
 };

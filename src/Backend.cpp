@@ -22,20 +22,34 @@
 
 #include <QDebug>
 
-Backend::Backend(QObject *parent) : QObject(parent) {
+#define BUFFER_SIZE 256
+
+Backend::Backend(QObject *parent) :
+            QObject(parent),
+            proc_stat("/proc/stat"),
+            meminfo("/proc/meminfo") {
+    proc_stat.open(QFile::ReadOnly);
+    meminfo.open(QFile::ReadOnly);
+
     getCpuLoad();
 }
 
+Backend::~Backend() = default;
+
 float
 Backend::getCpuLoad() {
+    char buffer[BUFFER_SIZE];
+
     unsigned long temp[4];
 
     unsigned long oldLoad = load;
     unsigned long oldTotal = total;
 
-    std::FILE* file = std::fopen("/proc/stat", "r");
-    std::fscanf(file, "%*s %ld %ld %ld %ld", &temp[0], &temp[1], &temp[2], &temp[3]);
-    std::fclose(file);
+    proc_stat.read(buffer, BUFFER_SIZE);
+    proc_stat.flush();
+    proc_stat.seek(0);
+
+    std::sscanf(buffer, "%*s %ld %ld %ld %ld", &temp[0], &temp[1], &temp[2], &temp[3]);
 
     load = temp[0] + temp[1] + temp[2];
     total = load + temp[3];
@@ -45,11 +59,15 @@ Backend::getCpuLoad() {
 
 unsigned long
 Backend::getUsedRam() {
+    char buffer[BUFFER_SIZE];
+
     unsigned long usedRam;
 
-    std::FILE* file = std::fopen("/proc/meminfo", "r");
-    std::fscanf(file, "%*[^\n]\n%*[^\n]\nMemAvailable:%*[ ]%lu kB", &usedRam);
-    std::fclose(file);
+    meminfo.read(buffer, BUFFER_SIZE);
+    meminfo.flush();
+    meminfo.seek(0);
+
+    std::sscanf(buffer, "%*[^\n]\n%*[^\n]\nMemAvailable:%*[ ]%lu kB", &usedRam);
 
     return getTotalRam() - (usedRam * 1024);
 }
