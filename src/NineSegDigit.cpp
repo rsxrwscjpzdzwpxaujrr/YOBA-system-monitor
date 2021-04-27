@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2021, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,7 +28,6 @@
 
 NineSegDigit::NineSegDigit(QQuickItem* parent) :
             QQuickItem(parent),
-            segmentCount(10),
             geometryValid(false),
             shiftValid(false),
             digit(' '),
@@ -296,151 +295,65 @@ NineSegDigit::setDigit(QChar digit) {
     if (Q_UNLIKELY(!acquireSegments()))
         return;
 
+    bool* state;
+
+    int dgSgCount = segmentCount - 1;
+
     switch (digit.toLatin1()) {
     case '0':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(color);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(offColor);
-        segments[7]->setEndColor(color);
-        segments[8]->setEndColor(color);
+        state = new bool[dgSgCount] { 1, 1, 1, 1, 1, 1, 0, 1, 1 };
         break;
 
     case '1':
-        segments[0]->setEndColor(offColor);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(offColor);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(offColor);
-        segments[7]->setEndColor(color);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 0, 1, 1, 0, 0, 0, 0, 1, 0 };
         break;
 
     case '2':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(offColor);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(color);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 1, 0, 1, 1, 0, 1, 0, 0 };
         break;
 
     case '3':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(color);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 0, 1, 1, 0, 0, 1, 1, 0 };
         break;
 
     case '4':
-        segments[0]->setEndColor(offColor);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(offColor);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 0, 1, 1, 0, 0, 1, 1, 0, 0 };
         break;
 
     case '5':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 0, 1, 1, 0, 1, 1, 0, 0 };
         break;
 
     case '6':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(color);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 0, 1, 1, 1, 1, 1, 0, 0 };
         break;
 
     case '7':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(offColor);
-        segments[3]->setEndColor(offColor);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(offColor);
-        segments[7]->setEndColor(color);
-        segments[8]->setEndColor(color);
+        state = new bool[dgSgCount] { 1, 0, 0, 0, 0, 0, 0, 1, 1 };
         break;
 
     case '8':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(color);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 1, 1, 1, 1, 1, 1, 0, 0 };
         break;
 
     case '9':
-        segments[0]->setEndColor(color);
-        segments[1]->setEndColor(color);
-        segments[2]->setEndColor(color);
-        segments[3]->setEndColor(color);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(color);
-        segments[6]->setEndColor(color);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 1, 1, 1, 1, 0, 1, 1, 0, 0 };
         break;
 
     case '/':
-        segments[0]->setEndColor(offColor);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(offColor);
-        segments[3]->setEndColor(offColor);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(offColor);
-        segments[7]->setEndColor(color);
-        segments[8]->setEndColor(color);
+        state = new bool[dgSgCount] { 0, 0, 0, 0, 0, 0, 0, 1, 1 };
         break;
 
     default:
-        segments[0]->setEndColor(offColor);
-        segments[1]->setEndColor(offColor);
-        segments[2]->setEndColor(offColor);
-        segments[3]->setEndColor(offColor);
-        segments[4]->setEndColor(offColor);
-        segments[5]->setEndColor(offColor);
-        segments[6]->setEndColor(offColor);
-        segments[7]->setEndColor(offColor);
-        segments[8]->setEndColor(offColor);
+        state = new bool[dgSgCount] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         break;
     }
+
+    for (int i = 0; i < dgSgCount; i++) {
+        segments[i]->setEndColor(state[i] ? color : offColor);
+    }
+
+    delete [] state;
 
     setPoint(point);
 }

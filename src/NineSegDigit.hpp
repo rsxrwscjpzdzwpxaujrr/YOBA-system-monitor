@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2021, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@ public slots:
     void setShift(float shift);
 
 private:
-    const int segmentCount;
+    static const int segmentCount = 10;
 
     Segment* segments[10];
     bool valid[10];
