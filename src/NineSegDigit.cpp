@@ -169,9 +169,9 @@ NineSegDigit::initSegments() {
 
     segments[1]->pol().translate(segmentLength, 0.0f);
     segments[2]->pol().translate(segmentLength, segmentLength);
-    segments[3]->pol().translate(0.0,           segmentLength * 2.0f);
-    segments[4]->pol().translate(0.0,           segmentLength);
-    segments[6]->pol().translate(0.0,           segmentLength);
+    segments[3]->pol().translate(0.0f,          segmentLength * 2.0f);
+    segments[4]->pol().translate(0.0f,          segmentLength);
+    segments[6]->pol().translate(0.0f,          segmentLength);
 
     segments[7]->pol() = weirdSegment();
 
@@ -295,65 +295,33 @@ NineSegDigit::setDigit(QChar digit) {
     if (Q_UNLIKELY(!acquireSegments()))
         return;
 
-    bool* state;
+    const int dgSgCount = segmentCount - 1;
 
-    int dgSgCount = segmentCount - 1;
+    const bool states[12][dgSgCount] = {
+        { 1, 1, 1, 1, 1, 1, 0, 1, 1 },
+        { 0, 1, 1, 0, 0, 0, 0, 1, 0 },
+        { 1, 1, 0, 1, 1, 0, 1, 0, 0 },
+        { 1, 0, 1, 1, 0, 0, 1, 1, 0 },
+        { 0, 1, 1, 0, 0, 1, 1, 0, 0 },
+        { 1, 0, 1, 1, 0, 1, 1, 0, 0 },
+        { 1, 0, 1, 1, 1, 1, 1, 0, 0 },
+        { 1, 0, 0, 0, 0, 0, 0, 1, 1 },
+        { 1, 1, 1, 1, 1, 1, 1, 0, 0 },
+        { 1, 1, 1, 1, 0, 1, 1, 0, 0 },
+        { 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    };
 
-    switch (digit.toLatin1()) {
-    case '0':
-        state = new bool[dgSgCount] { 1, 1, 1, 1, 1, 1, 0, 1, 1 };
-        break;
+    int stateNum = 11;
 
-    case '1':
-        state = new bool[dgSgCount] { 0, 1, 1, 0, 0, 0, 0, 1, 0 };
-        break;
-
-    case '2':
-        state = new bool[dgSgCount] { 1, 1, 0, 1, 1, 0, 1, 0, 0 };
-        break;
-
-    case '3':
-        state = new bool[dgSgCount] { 1, 0, 1, 1, 0, 0, 1, 1, 0 };
-        break;
-
-    case '4':
-        state = new bool[dgSgCount] { 0, 1, 1, 0, 0, 1, 1, 0, 0 };
-        break;
-
-    case '5':
-        state = new bool[dgSgCount] { 1, 0, 1, 1, 0, 1, 1, 0, 0 };
-        break;
-
-    case '6':
-        state = new bool[dgSgCount] { 1, 0, 1, 1, 1, 1, 1, 0, 0 };
-        break;
-
-    case '7':
-        state = new bool[dgSgCount] { 1, 0, 0, 0, 0, 0, 0, 1, 1 };
-        break;
-
-    case '8':
-        state = new bool[dgSgCount] { 1, 1, 1, 1, 1, 1, 1, 0, 0 };
-        break;
-
-    case '9':
-        state = new bool[dgSgCount] { 1, 1, 1, 1, 0, 1, 1, 0, 0 };
-        break;
-
-    case '/':
-        state = new bool[dgSgCount] { 0, 0, 0, 0, 0, 0, 0, 1, 1 };
-        break;
-
-    default:
-        state = new bool[dgSgCount] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        break;
-    }
+    if (Q_LIKELY(digit.isDigit()))
+        stateNum = digit.digitValue();
+    else if (digit.toLatin1() == '/')
+        stateNum = 10;
 
     for (int i = 0; i < dgSgCount; i++) {
-        segments[i]->setEndColor(state[i] ? color : offColor);
+        segments[i]->setEndColor(states[stateNum][i] ? color : offColor);
     }
-
-    delete [] state;
 
     setPoint(point);
 }
