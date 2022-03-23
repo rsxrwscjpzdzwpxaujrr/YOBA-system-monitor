@@ -56,6 +56,7 @@ ListView {
     width: childrenRect.width
 
     spacing: 6
+    interactive: false
 
     delegate: NineSegDigit {
         id: display
