@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2022, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,6 +31,8 @@ NineSegDigit::NineSegDigit(QQuickItem* parent) :
             geometryValid(false),
             shiftValid(false),
             digit(' '),
+            point(false),
+            nine(false),
             color(0.0f, 0.0f, 0.0f, 0),
             offColor(0.0f, 0.0f, 0.0f, 0),
             segmentLength(-1.0f),
@@ -175,7 +177,7 @@ NineSegDigit::initSegments() {
 
     segments[7]->pol() = weirdSegment();
 
-    for (QPointF p: segments[7]->pol()) {
+    for (QPointF p: qAsConst(segments[7]->pol())) {
         segments[8]->pol().append(QPointF(segmentLength - p.x(), segmentLength - p.y()));
     }
 
@@ -297,19 +299,20 @@ NineSegDigit::setDigit(QChar digit) {
 
     const int dgSgCount = segmentCount - 1;
 
-    const bool states[12][dgSgCount] = {
-        { 1, 1, 1, 1, 1, 1, 0, 1, 1 },
-        { 0, 1, 1, 0, 0, 0, 0, 1, 0 },
-        { 1, 1, 0, 1, 1, 0, 1, 0, 0 },
-        { 1, 0, 1, 1, 0, 0, 1, 1, 0 },
-        { 0, 1, 1, 0, 0, 1, 1, 0, 0 },
-        { 1, 0, 1, 1, 0, 1, 1, 0, 0 },
-        { 1, 0, 1, 1, 1, 1, 1, 0, 0 },
-        { 1, 0, 0, 0, 0, 0, 0, 1, 1 },
-        { 1, 1, 1, 1, 1, 1, 1, 0, 0 },
-        { 1, 1, 1, 1, 0, 1, 1, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 1, 1 },
-        { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    const bool states[12][dgSgCount + 7] = {
+//     7  A  B  C  D  E  F  G  9  A  B  C  D  E  F  G  H  I
+        { 1, 1, 1, 1, 1, 1, 0,    1, 1, 1, 1, 1, 1, 1, 1, 0 }, // 0
+        { 0, 1, 1, 0, 0, 0, 0,    1, 0, 0, 1, 1, 0, 0, 0, 0 }, // 1
+        { 1, 1, 0, 1, 1, 0, 1,    0, 0, 1, 1, 0, 1, 1, 0, 1 }, // 2
+        { 1, 0, 1, 1, 0, 0, 1,    1, 0, 1, 1, 1, 1, 0, 0, 1 }, // 3
+        { 0, 1, 1, 0, 0, 1, 1,    0, 0, 0, 1, 1, 0, 0, 1, 1 }, // 4
+        { 1, 0, 1, 1, 0, 1, 1,    0, 0, 1, 0, 1, 1, 0, 1, 1 }, // 5
+        { 1, 0, 1, 1, 1, 1, 1,    0, 0, 1, 0, 1, 1, 1, 1, 1 }, // 6
+        { 1, 0, 0, 0, 0, 0, 0,    1, 1, 1, 1, 1, 0, 0, 0, 0 }, // 7
+        { 1, 1, 1, 1, 1, 1, 1,    0, 0, 1, 1, 1, 1, 1, 1, 1 }, // 8
+        { 1, 1, 1, 1, 0, 1, 1,    0, 0, 1, 1, 1, 1, 0, 1, 1 }, // 9
+        { 0, 0, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0, 0, 0, 0 }, // /
+        { 0, 0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0, 0, 0, 0 }  //
     };
 
     int stateNum = 11;
@@ -320,7 +323,13 @@ NineSegDigit::setDigit(QChar digit) {
         stateNum = 10;
 
     for (int i = 0; i < dgSgCount; i++) {
-        segments[i]->setEndColor(states[stateNum][i] ? color : offColor);
+        QColor newColor = QColorConstants::Transparent;
+
+        if (i < 7 || nine) {
+            newColor = states[stateNum][i + (nine ? 0 : dgSgCount)] ? color : offColor;
+        }
+
+        segments[i]->setEndColor(newColor);
     }
 
     setPoint(point);
@@ -384,4 +393,14 @@ NineSegDigit::setShift(float shift) {
     updateSizes();
 
     update();
+}
+
+void
+NineSegDigit::setNine(bool nine) {
+    if (Q_UNLIKELY(NineSegDigit::nine == nine))
+        return;
+
+    NineSegDigit::nine = nine;
+
+    setDigit(digit);
 }

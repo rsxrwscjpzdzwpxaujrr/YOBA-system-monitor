@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020, 2022 Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -70,5 +70,13 @@ ListView {
 
         color: root.color
         offColor: root.offColor
+
+        nine: true
+
+        MouseArea {
+            anchors.fill: parent
+
+            onClicked: display.nine = !display.nine
+        }
     }
 }

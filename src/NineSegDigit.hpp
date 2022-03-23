@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2022, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,6 +29,7 @@ class NineSegDigit : public QQuickItem {
     Q_PROPERTY(QChar  digit        MEMBER digit        WRITE setDigit)
     Q_PROPERTY(bool   point        MEMBER point        WRITE setPoint)
     Q_PROPERTY(float  shift        MEMBER shift        WRITE setShift)
+    Q_PROPERTY(bool   nine         MEMBER nine         WRITE setNine )
     Q_PROPERTY(QColor color        MEMBER color        WRITE setColor        REQUIRED)
     Q_PROPERTY(QColor offColor     MEMBER offColor     WRITE setOffColor     REQUIRED)
     Q_PROPERTY(float  segmentWidth MEMBER segmentWidth WRITE setSegmentWidth REQUIRED)
@@ -36,7 +37,7 @@ class NineSegDigit : public QQuickItem {
 
 public:
     NineSegDigit(QQuickItem* parent=nullptr);
-    ~NineSegDigit();
+    ~NineSegDigit() override;
 
 protected:
     void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
@@ -49,6 +50,7 @@ public slots:
     void setPoint(bool point);
     void setSegmentWidth(float segmentWidth);
     void setShift(float shift);
+    void setNine(bool nine);
 
 private:
     static const int segmentCount = 10;
@@ -60,6 +62,7 @@ private:
 
     QChar digit;
     bool point;
+    bool nine;
 
     QColor color;
     QColor offColor;
