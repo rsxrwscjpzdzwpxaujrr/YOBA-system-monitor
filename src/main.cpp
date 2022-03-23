@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020, 2022 Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 #include <QQuickWindow>
 
 #include "Backend.hpp"
+#include "NineSegDigit.hpp"
 
 int main(int argc, char *argv[]) {
     qputenv("QSG_RENDER_LOOP", "basic");
@@ -30,6 +31,11 @@ int main(int argc, char *argv[]) {
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+
+    Backend backend;
+
+    qmlRegisterType             <NineSegDigit>("Local", 1, 0, "NineSegDigit");
+    qmlRegisterSingletonInstance<Backend     >("Local", 1, 0, "Backend", &backend);
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/src/main.qml"));
