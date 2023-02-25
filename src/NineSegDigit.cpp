@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,7 +30,7 @@ NineSegDigit::NineSegDigit(QQuickItem* parent) :
             QQuickItem(parent),
             geometryValid(false),
             shiftValid(false),
-            digit(' '),
+            digit(" "),
             point(false),
             nine(false),
             color(0.0f, 0.0f, 0.0f, 0),
@@ -54,8 +54,8 @@ NineSegDigit::~NineSegDigit() {
 }
 
 void
-NineSegDigit::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) {
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+NineSegDigit::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) {
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
 
     if (Q_UNLIKELY(newGeometry.height() == oldGeometry.height()))
         return;
@@ -66,6 +66,8 @@ NineSegDigit::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeomet
         return;
 
     initSegments();
+
+    setDigit(digit);
 }
 
 QPolygonF
@@ -290,8 +292,9 @@ NineSegDigit::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNodeData* da
     return node;
 }
 
+
 void
-NineSegDigit::setDigit(QChar digit) {
+NineSegDigit::setDigit(const QString& digit) {
     NineSegDigit::digit = digit;
 
     if (Q_UNLIKELY(!acquireSegments()))
@@ -317,9 +320,9 @@ NineSegDigit::setDigit(QChar digit) {
 
     int stateNum = 11;
 
-    if (Q_LIKELY(digit.isDigit()))
-        stateNum = digit.digitValue();
-    else if (digit.toLatin1() == '/')
+    if (Q_LIKELY(digit[0].isDigit()))
+        stateNum = digit[0].digitValue();
+    else if (digit[0].toLatin1() == '/')
         stateNum = 10;
 
     for (int i = 0; i < dgSgCount; i++) {
@@ -374,11 +377,14 @@ NineSegDigit::setSegmentWidth(float segmentWidth) {
 
     off = segmentWidth / 6.0f;
     pointSize = segmentWidth * 1.333f;
+    segmentLength = (height() - segmentWidth) / 2.0f;
 
     if (Q_UNLIKELY(!acquireSegments()))
         return;
 
     initSegments();
+
+    setDigit(digit);
 }
 
 void

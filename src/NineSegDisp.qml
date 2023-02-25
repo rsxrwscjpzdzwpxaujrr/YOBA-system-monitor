@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, 2022 Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,9 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
-import QtGraphicalEffects 1.0
-import Local 1.0
+import QtQuick
+import Local
 
 ListView {
     id: root
@@ -33,18 +32,17 @@ ListView {
     property real segmentWidth: 5.5
 
     model: ListModel {
-        id: model
     }
 
     function update() {
-        let value = root.value;
+        let value = root.value
 
         while (value.length < digits) {
-            value = " " + value;
+            value = " " + value
         }
 
         for (let i = 0; i < digits; i++) {
-            model.set(i, { "digit": value[i], "point": i === point1 | i === point2 });
+            model.set(i, { "digit": value[i] + '', "point": i === point1 | i === point2 })
         }
     }
 

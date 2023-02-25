@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
-import QtGraphicalEffects 1.0
+import QtQuick
+import Qt5Compat.GraphicalEffects
 
 import Local 1.0
 
@@ -115,20 +115,21 @@ Item {
             layer.enabled: true
             layer.effect: Glow {
                 radius: 15
-                samples: 13
+                transparentBorder: true
                 color: inDisplay.color
                 spread: 0
             }
         }
 
-        layer.enabled: true
-        layer.effect: InnerShadow {
-            horizontalOffset: 0
-            verticalOffset: 20
-            radius: 40.0
-            samples: 12
-            color: "#30000000"
-        }
+/// TODO inner shadows are removed in Qt 6, need to find a solution
+//        layer.enabled: true
+//        layer.effect: InnerShadow {
+//            horizontalOffset: 0
+//            verticalOffset: 20
+//            radius: 40.0
+//            samples: 12
+//            color: "#30000000"
+//        }
     }
 
     Text {
@@ -151,7 +152,7 @@ Item {
             horizontalOffset: 0
             verticalOffset: 12
             radius: 12.0
-            samples: 6
+            transparentBorder: true
             color: "#80000000"
         }
     }
@@ -177,7 +178,7 @@ Item {
             horizontalOffset: 0
             verticalOffset: 12
             radius: 12.0
-            samples: 6
+            transparentBorder: true
             color: "#80000000"
         }
     }

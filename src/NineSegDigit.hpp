@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,13 +26,13 @@ class Segment;
 
 class NineSegDigit : public QQuickItem {
     Q_OBJECT
-    Q_PROPERTY(QChar  digit        MEMBER digit        WRITE setDigit)
-    Q_PROPERTY(bool   point        MEMBER point        WRITE setPoint)
-    Q_PROPERTY(float  shift        MEMBER shift        WRITE setShift)
-    Q_PROPERTY(bool   nine         MEMBER nine         WRITE setNine )
-    Q_PROPERTY(QColor color        MEMBER color        WRITE setColor        REQUIRED)
-    Q_PROPERTY(QColor offColor     MEMBER offColor     WRITE setOffColor     REQUIRED)
-    Q_PROPERTY(float  segmentWidth MEMBER segmentWidth WRITE setSegmentWidth REQUIRED)
+    Q_PROPERTY(QString digit        MEMBER digit        WRITE setDigit)
+    Q_PROPERTY(bool    point        MEMBER point        WRITE setPoint)
+    Q_PROPERTY(float   shift        MEMBER shift        WRITE setShift)
+    Q_PROPERTY(bool    nine         MEMBER nine         WRITE setNine )
+    Q_PROPERTY(QColor  color        MEMBER color        WRITE setColor)
+    Q_PROPERTY(QColor  offColor     MEMBER offColor     WRITE setOffColor)
+    Q_PROPERTY(float   segmentWidth MEMBER segmentWidth WRITE setSegmentWidth)
     QML_ELEMENT
 
 public:
@@ -40,11 +40,11 @@ public:
     ~NineSegDigit() override;
 
 protected:
-    void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+    void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
     QSGNode* updatePaintNode(QSGNode* node, UpdatePaintNodeData* data) override;
 
 public slots:
-    void setDigit(QChar digit);
+    void setDigit(const QString& digit);
     void setColor(const QColor& color);
     void setOffColor(const QColor& offColor);
     void setPoint(bool point);
@@ -60,7 +60,7 @@ private:
     bool geometryValid;
     bool shiftValid;
 
-    QChar digit;
+    QString digit;
     bool point;
     bool nine;
 

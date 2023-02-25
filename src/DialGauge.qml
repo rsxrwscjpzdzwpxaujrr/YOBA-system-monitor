@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,8 +15,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.0
-import QtGraphicalEffects 1.12
+import QtQuick
+import Qt5Compat.GraphicalEffects
 
 Canvas {
     id: root
@@ -43,14 +43,15 @@ Canvas {
         radius: size / 2
         color: "#002b36"
 
-        layer.enabled: true
-        layer.effect: InnerShadow {
-            horizontalOffset: 0
-            verticalOffset: 20
-            radius: 40.0
-            samples: 12
-            color: "#30000000"
-        }
+/// TODO inner shadows are removed in Qt 6, need to find a solution
+//        layer.enabled: true
+//        layer.effect: InnerShadow {
+//            horizontalOffset: 0
+//            verticalOffset: 20
+//            radius: 40.0
+//            samples: 12
+//            color: "#30000000"
+//        }
     }
 
     onPaint: {
@@ -153,7 +154,7 @@ Canvas {
             horizontalOffset: Math.sin(pointer.angle * (Math.PI / 180)) * 6
             verticalOffset: Math.cos(pointer.angle * (Math.PI / 180)) * 6
             radius: 12.0
-            samples: 6
+            transparentBorder: true
             color: "#40000000"
         }
     }
