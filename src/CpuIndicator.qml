@@ -94,6 +94,7 @@ Item {
                 transparentBorder: true
                 color: inDisplay.color
                 spread: 0
+                samples: 16
             }
         }
 
