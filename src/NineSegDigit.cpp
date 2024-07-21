@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2023, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
+ * Copyright (c) 2020-2024, Мира Странная <rsxrwscjpzdzwpxaujrr@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -302,7 +302,7 @@ NineSegDigit::setDigit(const QString& digit) {
 
     const int dgSgCount = segmentCount - 1;
 
-    const bool states[12][dgSgCount + 7] = {
+    const bool states[13][dgSgCount + 7] = {
 //     7  A  B  C  D  E  F  G  9  A  B  C  D  E  F  G  H  I
         { 1, 1, 1, 1, 1, 1, 0,    1, 1, 1, 1, 1, 1, 1, 1, 0 }, // 0
         { 0, 1, 1, 0, 0, 0, 0,    1, 0, 0, 1, 1, 0, 0, 0, 0 }, // 1
@@ -315,15 +315,18 @@ NineSegDigit::setDigit(const QString& digit) {
         { 1, 1, 1, 1, 1, 1, 1,    0, 0, 1, 1, 1, 1, 1, 1, 1 }, // 8
         { 1, 1, 1, 1, 0, 1, 1,    0, 0, 1, 1, 1, 1, 0, 1, 1 }, // 9
         { 0, 0, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0, 0, 0, 0 }, // /
+        { 0, 0, 0, 0, 0, 0, 1,    0, 0, 0, 0, 0, 0, 1, 0, 0 }, // -
         { 0, 0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0, 0, 0, 0 }  //
     };
 
-    int stateNum = 11;
+    int stateNum = 12;
 
     if (Q_LIKELY(digit[0].isDigit()))
         stateNum = digit[0].digitValue();
     else if (digit[0].toLatin1() == '/')
         stateNum = 10;
+    else if (digit[0].toLatin1() == '-')
+        stateNum = 11;
 
     for (int i = 0; i < dgSgCount; i++) {
         QColor newColor = QColorConstants::Transparent;
